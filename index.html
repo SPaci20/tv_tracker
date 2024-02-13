@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+    <meta content="ie=edge" http-equiv="X-UA-Compatible">
+    <link href="favicon.ico" rel="icon" type="image/x-icon">
+    <title>Shows</title>
+    <link href="shows.css" rel="stylesheet">
+    <style>
+
+        .hidden {
+            display: none !important;
+        }
+
+    </style>
+</head>
+
+<body class="unchecked">
+<div id="wrapper">
+    <div id="wrapper-inner">
+
+        <div id="firstTime" class="hidden">
+            <h1>Welcome to the TV Show Tracker.</h1>
+            <p>To set your preferences, click the <span class='material-icons'>settings</span> icon in the top right
+                hand corner. Use the <span class='material-icons material-icons-outlined'>toggle_on</span> icon to
+                toggle dark mode.</p>
+            <p>The tracker is split into two main sections - Shows that are currently airing go in the <strong>Currently
+                Airing</strong> section.
+                Shows that are not currently airing go in the <strong>Not Currently Airing</strong> section, which is
+                split into <strong>Scheduled</strong>, <strong>Waiting/Hoping</strong>, and <strong>Ended</strong>.</p>
+            <p>You can manually move shows between Currently Airing and Not Currently Airing. The system will
+                automatically sort not currently airing shows into Scheduled, Waiting/Hoping or Ended.</p>
+
+            <p>To add a show, click one of the add links. </p>
+            <p>All data is stored locally in your browser. You can export and import your setup from the settings
+                screen. If you have changed something, an orange <span
+                        class='material-icons material-icons-outlined export'>save</span> icon will appear to the left
+                of the dark mode toggle to indicate a change since the last export. You can click the icon to export
+                your data.</p>
+            <p>For full instructions on how to use this site, please see the <a
+                    href='https://github.com/tvshowtracker/tv/blob/master/README.md' target='_blank'>README.md</a> file
+                in the Github repository. A link to the Github repository can also be found at the top right of the
+                settings screen.
+            </p>
+            <p>This message will disappear after you add your first show.</p>
+        </div>
+        <h1><span title='Shows that you are currently watching. These will stay here until you move them down.'>Currently Airing</span>
+            <a title='Show links to watch/download shows' href='javascript:getLinks();'>Links</a> <a
+                    title='Add a new show. It will be put in the current area.'
+                    href='javascript:addShow("currentShows");'>Add</a>
+        </h1>
+        <div class="hidden" id="countryCheck"></div>
+        <div class='hidden' id='connectionStatus'></div>
+        <div class='clear'></div>
+        <div class="wrapper" id="current"><span class="loader"></span></div>
+        <hr class='separator'/>
+        <h1><span title='Shows that are not currently airing.'>Not Currently Airing</span> <a
+                title='Add a new show. It will be put in scheduled/waiting/ended automatically.'
+                href='javascript:addShow("pendingShows");'>Add</a></h1>
+        <h2><span title='Shows that have a date for the next episode.'>Scheduled</span> <a
+                title='Get the latest updates for all scheduled shows' href='javascript:refreshScheduledShows();'>Refresh
+            All</a></h2>
+        <div class="wrapper" id="scheduled"><span class="loader"></span></div>
+
+        <h2><span title="Shows that do not yet have a new season scheduled.">Waiting/Hoping for Next Season</span> <a
+                title='Get the latest updates for all shows waiting for a new season'
+                href='javascript:refreshPendingShows();'>Refresh All</a></h2>
+        <div class="wrapper" id="waiting"><span class="loader"></span></div>
+
+        <h2><span title="Shows that have an ended date and no more seasons are expected.">Ended</span></h2>
+        <div class="wrapper" id="ended"><span class="loader"></span></div>
+
+        <div class="hidden modal  cancelModal" id="addEdit-wrapper">
+            <div data-addTo="" data-mode="" data-show="" id="addEdit">
+                <h1><span>Add</span> Show</h1>
+                <div class="row"><label for="addEditName">Name:</label><input id="addEditName"></div>
+                <div id="results-wrapper">
+                    <div id="results"></div>
+                </div>
+                <div class="row buttons"><input class="save" id="searchShow" type="button" value="Search"> <input
+                        class="cancelModal" type="button" value="Cancel"></div>
+            </div>
+        </div>
+        <div class="hidden modal cancelModal" id="edit-renewal-wrapper">
+            <div data-addTo="" data-mode="" data-show="" id="addEditRenewal">
+                <h1>Edit Renewal Note</h1>
+                <div class="showSubheader"><em><span class='show'></span></em></div>
+                <div class="row"><label for="renewalNote">Renewal Note:</label><input id="renewalNote" value=""></div>
+                <div id="renewal-results-wrapper">
+                    <div id="renewal-results"></div>
+                </div>
+                <div class="row buttons"><input class="save" id="saveRenewalNote" type="button" value="Save"> <input
+                        class="cancelModal" type="button" value="Cancel"></div>
+            </div>
+        </div>
+
+
+        <div class="hidden modal cancelModal" id="show-details-wrapper">
+            <div id="show-details">
+                <h1></h1>
+                <div class="details"></div>
+                <div class="row buttons"><input class="cancelModal" type="button" value="Close"></div>
+            </div>
+        </div>
+        <div class="hidden modal cancelModal" id="settings-wrapper">
+            <div id="settings">
+                <a id='github' title="Visit TV Show Tracker Github Repository"
+                   href='https://github.com/tvshowtracker/tv' target='_blank'><img alt="Github Logo"
+                                                                                   src="github-mark.png"
+                                                                                   class="github-logo"></a>
+                <h1>Settings</h1>
+                <div class="inner">
+                    <div class="importExportButtons"><input id="export" type="button" value="Export Shows"> <input
+                            id="import" type="button" value="Import Shows"></div>
+                    <div class="row"><label for="settingsShowEmojis">Show Emojis</label><input checked class="setting"
+                                                                                               id="settingsShowEmojis"
+                                                                                               type="checkbox"></div>
+                    <div class="row"><label for="settingsDateFormat">Date Format</label><input class="setting"
+                                                                                               id="settingsDateFormat"
+                                                                                               type="text"
+                                                                                               value="m/d/Y"></div>
+                    <div class="row sub"><em>Y, y, M, m, D, and d can be used for the date format.</em></div>
+                    <div class="row"><label for="settingsShowNameLink">Show Name points to</label><select
+                            class="setting" id="settingsShowNameLink">
+                        <option selected value='internal'>Show Info</option>
+                        <option value='tvMaze'>TV Maze</option>
+                        <option value='imdb'>IMDB</option>
+                        <option value='thetvdb'>thetvdb</option>
+                        <option value='duckduckgo'>Search duckduckgo</option>
+                        <option value='bing'>Search bing</option>
+                        <option value='google'>Search google</option>
+                        <option value='custom'>Custom</option>
+
+                    </select></div>
+                    <div class="hidden customShowNameLink">
+                        <div class="row"><label for="settingsShowNameLinkCustom">Custom URL</label><input
+                                class="setting"
+                                id="settingsShowNameLinkCustom"
+                                type="text"
+                                value="">
+                        </div>
+                        <div class="row sub"><em><strong>%SHOW%</strong> will be replaced with the show name</em></div>
+                    </div>
+                    <div class="row"><label for="settingsReleaseNotesLink">Renewal Notes points to</label><select
+                            class="setting" id="settingsReleaseNotesLink">
+                        <option value='tvMaze'>TV Maze</option>
+                        <option value='imdb'>IMDB</option>
+                        <option value='thetvdb'>thetvdb</option>
+                        <option selected value='duckduckgo'>Search duckduckgo</option>
+                        <option value='bing'>Search bing</option>
+                        <option value='google'>Search google</option>
+                        <option value='custom'>Custom</option>
+
+                    </select></div>
+                    <div class="hidden customReleaseNotesLink">
+                        <div class="row"><label for="settingsReleaseNotesLinkCustom">Custom URL</label><input
+                                class="setting"
+                                id="settingsReleaseNotesLinkCustom"
+                                type="text"
+                                value="">
+                        </div>
+                        <div class="row sub"><em><strong>%SHOW%</strong> will be replaced with the show name</em></div>
+                    </div>
+
+                    <h2>Links</h2>
+                    <div class="row"><label for="settingsOpenLinksInNewWindow">Open in New Window</label><input
+                            checked class="setting" id="settingsOpenLinksInNewWindow" type="checkbox"></div>
+                    <div class="row"><label for="settingsCheckLocation">Check Location</label><input class="setting"
+                                                                                                     id="settingsCheckLocation"
+                                                                                                     type="checkbox">
+                    </div>
+                    <div class="row hidden"><label for="settingsCountryOkRegex">Country Code OK Regex</label><input
+                            class="setting" id="settingsCountryOkRegex" type="text"></div>
+                    <div class="row"><label for="settingsAppendToSearch">Append to Search</label><input checked
+                                                                                                        class="setting"
+                                                                                                        id="settingsAppendToSearch"
+                                                                                                        type="text">
+                    </div>
+
+                    <div class="row"><a class="addLink" href='javascript:void(0)'>Add
+                        Link</a><br><em><strong>%SEARCH%</strong> will be replaced with the search text.</em></div>
+
+                    <div class="links"></div>
+
+
+                </div>
+                <div class="row buttons settings-buttons">
+
+                    <div><input class="save" id="saveSettings" type="button" value="Save"> <input class="cancelModal"
+                                                                                                  type="button"
+                                                                                                  value="Cancel"></div>
+                </div>
+            </div>
+        </div>
+        <div id="footer"><span>Uses <a href="https://www.tvmaze.com/" target="_blank">https://www.tvmaze.com/</a></span>
+        </div>
+        <div id="icons">
+            <div id="stats"></div>
+            <a title="A show has changed since your last export. Click to export now." class="export hidden"
+               href="javascript:void(0)"><span
+                    class="material-icons material-icons-outlined">save</span></a>
+            <a title="Toggle dark mode" class="toggleDarkMode" href="javascript:void(0)"><span
+                    class="material-icons material-icons-outlined toggleDarkMode">toggle_on</span></a>
+            <a title="Settings" class="toggleSettings" href="javascript:void(0)"><span
+                    class="material-icons toggleSettings">settings</span></a>
+
+        </div>
+
+    </div>
+</div>
+</body>
+<script src="shows.js"></script>
+</html>
