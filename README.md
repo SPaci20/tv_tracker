@@ -2,7 +2,7 @@
 This is an app that will keep track of TV shows that you've watched or are watching.
 
 Created by Pacifique SHIMIRWA (https://github.com/SPaci20)
-       and Vincent DUSHIME (htpps://github.com/Vincidax).
+       and Vincent DUSHIME (https://github.com/Vincidax).
 
 A simple TV Show Tracker that saves your data locally in your browser. This app uses the free api provided by https://www.tvmaze.com
 
